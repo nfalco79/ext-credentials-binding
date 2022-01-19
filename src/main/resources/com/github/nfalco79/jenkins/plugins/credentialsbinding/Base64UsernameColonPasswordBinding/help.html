@@ -1,0 +1,24 @@
+<!--
+ - Copyright (c) 2021, Nikolas Falco
+ -
+ - Licensed under the Apache License, Version 2.0 (the
+ - "License"); you may not use this file except in compliance
+ - with the License.  You may obtain a copy of the License at
+ -
+ -   http://www.apache.org/licenses/LICENSE-2.0
+ -
+ - Unless required by applicable law or agreed to in writing,
+ - software distributed under the License is distributed on an
+ - "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ - KIND, either express or implied.  See the License for the
+ - specific language governing permissions and limitations
+ - under the License.
+ -->
+<div>
+    Sets a variable to the username and password given in the credentials, separated by a colon (<code>:</code>) encoded base64.
+</div>
+<div>
+    <strong>Warning</strong>: if the master or slave node has multiple executors,
+    any other build running concurrently on the same node will be able to read
+    the text of the secret, for example on Linux using <code>ps e</code>.
+</div>
