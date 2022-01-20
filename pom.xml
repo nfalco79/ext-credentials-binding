@@ -9,7 +9,7 @@
 
     <groupId>com.github.nfalco79</groupId>
     <artifactId>ext-credentials-binding</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <name>Extension for Credentials Binding Plugin</name>
     <description>Allows credentials to be bound to environment variables for use from miscellaneous build steps.</description>
@@ -37,7 +37,7 @@
         <url>https://github.com/nfalco79/ext-credentials-binding</url>
         <connection>scm:git:git@github.com:nfalco79/ext-credentials-binding.git</connection>
         <developerConnection>scm:git:git@github.com:nfalco79/ext-credentials-binding.git</developerConnection>
-        <tag>ext-credentials-binding-1.0.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
