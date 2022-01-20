@@ -92,7 +92,7 @@ public class UsernameBase64PasswordBindingTest {
         assertEquals(username, bindingValue);
         bindingValue = b.getWorkspace().child("pwd.txt").readToString().trim();
         assertEquals(Base64.getEncoder().encodeToString(password.getBytes()), bindingValue);
-        Assertions.assertThat(b.getSensitiveBuildVariables()).contains("USER", "PASSWORD");
+        Assertions.assertThat(b.getSensitiveBuildVariables()).contains("PASSWORD");
     }
 
     @Test
@@ -104,13 +104,13 @@ public class UsernameBase64PasswordBindingTest {
                 break;
             }
         }
-        assertThat("The system credentials provider is enabled", store, notNullValue());
+        Assertions.assertThat(store).as("The system credentials provider is enabled").isNotNull();
 
         UsernamePasswordCredentialsImpl credentials = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, "secret-id", "test credentials", "bob", "secret");
         store.addCredentials(Domain.global(), credentials);
 
         Fingerprint fingerprint = CredentialsProvider.getFingerprintOf(credentials);
-        assertThat("No fingerprint created until first use", fingerprint, nullValue());
+        Assertions.assertThat(fingerprint).as("No fingerprint created until first use").isNull();
 
         JenkinsRule.WebClient wc = r.createWebClient();
         HtmlPage page = wc.goTo("credentials/store/system/domain/_/credentials/secret-id");

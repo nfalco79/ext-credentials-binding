@@ -46,10 +46,11 @@ public class UsernameBase64PasswordBinding extends UsernamePasswordMultiBinding 
                                  Launcher launcher,
                                  TaskListener listener) throws IOException, InterruptedException {
         StandardUsernamePasswordCredentials credentials = getCredentials(build);
-        Map<String,String> m = new LinkedHashMap<>();
-        m.put(getUsernameVariable(), credentials.getUsername());
-        m.put(getPasswordVariable(), Base64.getEncoder().encodeToString(credentials.getPassword().getPlainText().getBytes("UTF-8")));
-        return new MultiEnvironment(m);
+        Map<String, String> secretValues = new LinkedHashMap<>();
+        Map<String, String> publicValues = new LinkedHashMap<>();
+        (credentials.isUsernameSecret() ? secretValues : publicValues).put(getUsernameVariable(), credentials.getUsername());
+        secretValues.put(getPasswordVariable(), Base64.getEncoder().encodeToString(credentials.getPassword().getPlainText().getBytes("UTF-8")));
+        return new MultiEnvironment(secretValues, publicValues);
     }
 
     @Symbol("usernameBase64Password")
