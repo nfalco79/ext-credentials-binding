@@ -30,7 +30,7 @@
     </developers>
     <issueManagement>
         <system>github</system>
-        <url>https://github.com/nfalco79/ext-config-files-plugin/issues</url>
+        <url>https://github.com/nfalco79/ext-credentials-binding/issues</url>
     </issueManagement>
 
     <scm>
@@ -134,5 +134,5 @@
                 </plugins>
             </build>
         </profile>
-    </profiles>  
+    </profiles>
 </project>
