@@ -18,15 +18,14 @@ package com.github.nfalco79.jenkins.plugins.credentialsbinding;
 import java.io.IOException;
 import java.util.Base64;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.credentialsbinding.Binding;
 import org.jenkinsci.plugins.credentialsbinding.BindingDescriptor;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -46,10 +45,10 @@ public class Base64StringBinding extends Binding<StringCredentials> {
     }
 
     @Override
-    public SingleEnvironment bindSingle(@Nonnull Run<?, ?> build,
+    public SingleEnvironment bindSingle(@NonNull Run<?, ?> build,
                                         @Nullable FilePath workspace,
                                         @Nullable Launcher launcher,
-                                        @Nonnull TaskListener listener) throws IOException, InterruptedException {
+                                        @NonNull TaskListener listener) throws IOException, InterruptedException {
         String secret = getCredentials(build).getSecret().getPlainText();
         return new SingleEnvironment(Base64.getEncoder().encodeToString(secret.getBytes("UTF-8")));
     }

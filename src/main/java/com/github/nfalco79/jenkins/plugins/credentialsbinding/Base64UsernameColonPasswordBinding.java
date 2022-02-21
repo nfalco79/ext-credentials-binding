@@ -18,9 +18,6 @@ package com.github.nfalco79.jenkins.plugins.credentialsbinding;
 import java.io.IOException;
 import java.util.Base64;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.credentialsbinding.Binding;
 import org.jenkinsci.plugins.credentialsbinding.BindingDescriptor;
@@ -28,6 +25,8 @@ import org.kohsuke.stapler.DataBoundConstructor;
 
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -47,10 +46,10 @@ public class Base64UsernameColonPasswordBinding extends Binding<StandardUsername
     }
 
     @Override
-    public SingleEnvironment bindSingle(@Nonnull Run<?, ?> build, //
+    public SingleEnvironment bindSingle(@NonNull Run<?, ?> build, //
                                         @Nullable FilePath workspace, //
                                         @Nullable Launcher launcher, //
-                                        @Nonnull TaskListener listener) throws IOException, InterruptedException {
+                                        @NonNull TaskListener listener) throws IOException, InterruptedException {
         StandardUsernamePasswordCredentials credentials = getCredentials(build);
         String usernameColumnPassword = credentials.getUsername() + ':' + credentials.getPassword().getPlainText();
         return new SingleEnvironment(Base64.getEncoder().encodeToString(usernameColumnPassword.getBytes("UTF-8")));
