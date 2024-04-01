@@ -173,7 +173,7 @@
                     <!-- used for local maven release build -->
                     <plugin>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.1.0</version>
+                        <version>3.2.2</version>
                         <executions>
                             <execution>
                                 <goals>
