@@ -15,26 +15,23 @@
  */
 package com.github.nfalco79.jenkins.plugins.credentialsbinding;
 
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
+import org.htmlunit.WebResponse;
+import org.htmlunit.html.HtmlPage;
 import org.jenkinsci.plugins.credentialsbinding.Binding;
 import org.jenkinsci.plugins.credentialsbinding.MultiBinding;
 import org.jenkinsci.plugins.credentialsbinding.impl.SecretBuildWrapper;
 import org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
-import org.xmlunit.matchers.CompareMatcher;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
+import org.xmlunit.assertj.XmlAssert;
 
 import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsParameterDefinition;
@@ -44,8 +41,6 @@ import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.CredentialsStore;
 import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.Domain;
-import com.gargoylesoftware.htmlunit.WebResponse;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import hudson.Functions;
 import hudson.Util;
@@ -60,14 +55,19 @@ import hudson.tasks.Shell;
 import hudson.util.Secret;
 import jenkins.model.Jenkins;
 
+@WithJenkins
 public class Base64StringBindingTest {
 
-    @Rule
-    public JenkinsRule r = new JenkinsRule();
+    private static JenkinsRule r;
     private CredentialsStore store = null;
 
+    @BeforeAll
+    static void init(JenkinsRule rule) {
+        r = rule;
+    }
+
     @Test
-    public void basics() throws Exception {
+    void basics() throws Exception {
         String password = "s3cr3t";
         StringCredentialsImpl c = new StringCredentialsImpl(CredentialsScope.GLOBAL, null, "sample", Secret.fromString(password));
         CredentialsProvider.lookupStores(r.jenkins).iterator().next().addCredentials(Domain.global(), c);
@@ -76,22 +76,22 @@ public class Base64StringBindingTest {
         p.getBuildersList().add(Functions.isWindows() ? new BatchFile("echo %AUTH% > auth.txt") : new Shell("echo $AUTH > auth.txt"));
         r.configRoundtrip(p);
         SecretBuildWrapper wrapper = p.getBuildWrappersList().get(SecretBuildWrapper.class);
-        assertNotNull(wrapper);
+        assertThat(wrapper).isNotNull();
         List<? extends MultiBinding<?>> bindings = wrapper.getBindings();
-        assertEquals(1, bindings.size());
+        assertThat(bindings).hasSize(1);
         MultiBinding<?> binding = bindings.get(0);
-        assertEquals(c.getId(), binding.getCredentialsId());
-        assertEquals(Base64StringBinding.class, binding.getClass());
-        assertEquals("AUTH", ((Base64StringBinding) binding).getVariable());
+        assertThat(binding.getCredentialsId()).isEqualTo(c.getId());
+        assertThat(binding).isInstanceOf(Base64StringBinding.class);
+        assertThat(((Base64StringBinding) binding).getVariable()).isEqualTo("AUTH");
         FreeStyleBuild b = r.buildAndAssertSuccess(p);
         r.assertLogNotContains(password, b);
         String bindingValue = b.getWorkspace().child("auth.txt").readToString().trim();
-        assertEquals(Base64.getEncoder().encodeToString(password.getBytes()), bindingValue);
-        assertEquals("[AUTH]", b.getSensitiveBuildVariables().toString());
+        assertThat(Base64.getEncoder().encodeToString(password.getBytes())).isEqualTo(bindingValue);
+        assertThat(b.getSensitiveBuildVariables()).hasToString("[AUTH]");
     }
 
     @Test
-    public void theSecretBuildWrapperTracksUsage() throws Exception {
+    void theSecretBuildWrapperTracksUsage() throws Exception {
         SystemCredentialsProvider.getInstance().setDomainCredentialsMap(Collections.singletonMap(Domain.global(), Collections.<Credentials> emptyList()));
         for (CredentialsStore s : CredentialsProvider.lookupStores(Jenkins.get())) {
             if (s.getProvider() instanceof SystemCredentialsProvider.ProviderImpl) {
@@ -99,19 +99,19 @@ public class Base64StringBindingTest {
                 break;
             }
         }
-        assertThat("The system credentials provider is enabled", store, notNullValue());
+        assertThat(store).describedAs("The system credentials provider is enabled").isNotNull();
 
         StringCredentialsImpl credentials = new StringCredentialsImpl(CredentialsScope.GLOBAL, "secret-id", "test credentials", Secret.fromString("secret"));
         store.addCredentials(Domain.global(), credentials);
 
         Fingerprint fingerprint = CredentialsProvider.getFingerprintOf(credentials);
-        assertThat("No fingerprint created until first use", fingerprint, nullValue());
+        assertThat(fingerprint).describedAs("No fingerprint created until first use").isNull();
 
         JenkinsRule.WebClient wc = r.createWebClient();
         HtmlPage page = wc.goTo("credentials/store/system/domain/_/credentials/secret-id");
-        assertThat("Have usage tracking reported", page.getElementById("usage"), notNullValue());
-        assertThat("No fingerprint created until first use", page.getElementById("usage-missing"), notNullValue());
-        assertThat("No fingerprint created until first use", page.getElementById("usage-present"), nullValue());
+        assertThat(page.getElementById("usage")).describedAs("Have usage tracking reported").isNotNull();
+        assertThat(page.getElementById("usage-missing")).describedAs("No fingerprint created until first use").isNotNull();
+        assertThat(page.getElementById("usage-present")).describedAs("No fingerprint created until first use").isNull();
 
         FreeStyleProject job = r.createFreeStyleProject();
         // add a parameter
@@ -120,12 +120,12 @@ public class Base64StringBindingTest {
         r.assertBuildStatusSuccess((Future) job.scheduleBuild2(0, new ParametersAction(new CredentialsParameterValue("SECRET", "secret-id", "The secret", true))));
 
         fingerprint = CredentialsProvider.getFingerprintOf(credentials);
-        assertThat("A job that does nothing does not use parameterized credentials", fingerprint, nullValue());
+        assertThat(fingerprint).describedAs("A job that does nothing does not use parameterized credentials").isNull();
 
         page = wc.goTo("credentials/store/system/domain/_/credentials/secret-id");
-        assertThat("Have usage tracking reported", page.getElementById("usage"), notNullValue());
-        assertThat("No fingerprint created until first use", page.getElementById("usage-missing"), notNullValue());
-        assertThat("No fingerprint created until first use", page.getElementById("usage-present"), nullValue());
+        assertThat(page.getElementById("usage")).describedAs("Have usage tracking reported").isNotNull();
+        assertThat(page.getElementById("usage-missing")).describedAs("No fingerprint created until first use").isNotNull();
+        assertThat(page.getElementById("usage-present")).describedAs("No fingerprint created until first use").isNull();
 
         // check that the wrapper works as expected
         job.getBuildWrappersList().add(new SecretBuildWrapper(Collections.<Binding<?>> singletonList(new Base64StringBinding("AUTH", credentials.getId()))));
@@ -133,20 +133,20 @@ public class Base64StringBindingTest {
         r.assertBuildStatusSuccess((Future) job.scheduleBuild2(0, new ParametersAction(new CredentialsParameterValue("SECRET", "secret-id", "The secret", true))));
 
         fingerprint = CredentialsProvider.getFingerprintOf(credentials);
-        assertThat(fingerprint, notNullValue());
-        assertThat(fingerprint.getJobs(), hasItem(is(job.getFullName())));
+        assertThat(fingerprint).isNotNull();
+        assertThat(fingerprint.getJobs()).contains(job.getFullName());
         Fingerprint.RangeSet rangeSet = fingerprint.getRangeSet(job);
-        assertThat(rangeSet, notNullValue());
-        assertThat(rangeSet.includes(job.getLastBuild().getNumber()), is(true));
+        assertThat(rangeSet).isNotNull();
+        assertThat(rangeSet.includes(job.getLastBuild().getNumber())).isTrue();
 
         page = wc.goTo("credentials/store/system/domain/_/credentials/secret-id");
-        assertThat(page.getElementById("usage-missing"), nullValue());
-        assertThat(page.getElementById("usage-present"), notNullValue());
-        assertThat(page.getAnchorByText(job.getFullDisplayName()), notNullValue());
+        assertThat(page.getElementById("usage-missing")).isNull();
+        assertThat(page.getElementById("usage-present")).isNotNull();
+        assertThat(page.getAnchorByText(job.getFullDisplayName())).isNotNull();
 
         // check the API
         WebResponse response = wc.goTo("credentials/store/system/domain/_/credentials/secret-id/api/xml?depth=1&xpath=*/fingerprint/usage", "application/xml").getWebResponse();
-        assertThat(response.getContentAsString(), CompareMatcher.isSimilarTo("<usage>"
+        XmlAssert.assertThat(response.getContentAsString()).and("<usage>"
                 + "<name>" + Util.xmlEscape(job.getFullName()) + "</name>"
                 + "<ranges>"
                 + "<range>"
@@ -154,6 +154,9 @@ public class Base64StringBindingTest {
                 + "<start>" + job.getLastBuild().getNumber() + "</start>"
                 + "</range>"
                 + "</ranges>"
-                + "</usage>").ignoreWhitespace().ignoreComments());
+                + "</usage>")
+            .ignoreComments()
+            .ignoreWhitespace()
+            .areSimilar();
     }
 }
