@@ -13,6 +13,7 @@
     <version>1.0.3-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <name>Extension for Credentials Binding Plugin</name>
+    <url>https://github.com/nfalco79/${project.artifactId}</url>
     <description>Allows credentials to be bound to environment variables for use from miscellaneous build steps.</description>
 
     <licenses>
@@ -31,11 +32,11 @@
     </developers>
     <issueManagement>
         <system>github</system>
-        <url>https://github.com/nfalco79/ext-credentials-binding/issues</url>
+        <url>${project.url}/issues</url>
     </issueManagement>
 
     <scm>
-        <url>https://github.com/nfalco79/ext-credentials-binding</url>
+        <url>${project.url}</url>
         <connection>scm:git:git@github.com:nfalco79/ext-credentials-binding.git</connection>
         <developerConnection>scm:git:git@github.com:nfalco79/ext-credentials-binding.git</developerConnection>
         <tag>HEAD</tag>
@@ -43,6 +44,8 @@
 
     <properties>
         <java.level>17</java.level>
+        <checkstyle.version>12.1.1</checkstyle.version>
+
         <jenkins.baseline>2.504</jenkins.baseline>
         <jenkins.version>${jenkins.baseline}.3</jenkins.version>
         <releaseProfiles>release</releaseProfiles>
@@ -64,16 +67,6 @@
             <url>https://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 
     <dependencyManagement>
         <dependencies>
@@ -121,6 +114,35 @@
                 <artifactId>central-publishing-maven-plugin</artifactId>
                 <version>0.9.0</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>ossrh</publishingServerId>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.6.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>${checkstyle.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <configLocation>${basedir}/checkstyle.xml</configLocation>
+                    <sourceDirectories>${project.build.sourceDirectory}</sourceDirectories>
+                    <testSourceDirectories>${project.build.testSourceDirectory}</testSourceDirectories>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <resourceIncludes>**/*.properties,**/*.jelly,**/*.html</resourceIncludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
