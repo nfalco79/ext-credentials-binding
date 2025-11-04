@@ -1,0 +1,15 @@
+^.+$
+^.{0,3}Copyright \d{4} .+$
+^.{0,3}$
+^.{0,3}Licensed under the Apache License, Version 2\.0 \(the
+^.{0,3}"License"\); you may not use this file except in compliance
+^.{0,3}with the License.  You may obtain a copy of the License at
+^.{0,3}$
+^.{0,3}   http://www.apache.org/licenses/LICENSE-2.0
+^.{0,3}$
+^.{0,3}Unless required by applicable law or agreed to in writing,
+^.{0,3}software distributed under the License is distributed on an
+^.{0,3}"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+^.{0,3}KIND, either express or implied.  See the License for the
+^.{0,3}specific language governing permissions and limitations
+^.{0,3}under the License.

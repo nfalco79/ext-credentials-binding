@@ -1,5 +1,6 @@
 /*
- * Copyright 2021 Falco Nikolas
+ * Copyright 2021 Nikolas Falco
+ *
  * Licensed under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
@@ -55,7 +56,7 @@ import hudson.tasks.Shell;
 import jenkins.model.Jenkins;
 
 @WithJenkins
-public class Base64UsernameColonPasswordBindingTest {
+class Base64UsernameColonPasswordBindingTest {
 
     private static JenkinsRule r;
     private CredentialsStore store = null;
