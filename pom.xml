@@ -10,7 +10,7 @@
 
     <groupId>com.github.nfalco79</groupId>
     <artifactId>ext-credentials-binding</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <name>Extension for Credentials Binding Plugin</name>
     <url>https://github.com/nfalco79/${project.artifactId}</url>
@@ -39,7 +39,7 @@
         <url>${project.url}</url>
         <connection>scm:git:git@github.com:nfalco79/ext-credentials-binding.git</connection>
         <developerConnection>scm:git:git@github.com:nfalco79/ext-credentials-binding.git</developerConnection>
-        <tag>ext-credentials-binding-1.0.3</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
